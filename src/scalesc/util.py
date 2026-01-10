@@ -94,7 +94,7 @@ class AnnDataBatchReader():
     def get_merged_adata_with_X(self): # merge on CPU only
         if self.batches:
             assert isinstance(self.batches[0].X, CPU_ARRAY_TYPE), "call 'batch_to_CPU()' to transfer all batches to CPU." 
-            adata_merged = ad.concat(self.batches)
+            adata_merged = ad.concat(self.batches, merge='same', uns_merge='same')
             return adata_merged
 
     def _batch_criteria(self, criteria, **kwargs):
@@ -111,7 +111,7 @@ class AnnDataBatchReader():
     
     def _get_anndata_obj(self):
         assert self.anndata is not None, "anndata object is empty! if preload_on_cpu is False, anndata will be automatically initialized after calling 'batchify()'."
-        obj = ad.concat(self.anndata)
+        obj = ad.concat(self.anndata, merge='same', uns_merge='same')
         if self.cells_filter is not None:
             filter_flatten = []
             for f in self.cells_filter:
@@ -236,7 +236,7 @@ class AnnDataBatchReader():
                 if len(batch) == 1:
                     d = batch.pop()
                 else:
-                    d = ad.concat(batch)
+                    d = ad.concat(batch, merge='same', uns_merge='same')
                 check_dtype(d)
                 # multiple GPUs enabled
                 if self.preload_on_gpu:
@@ -262,7 +262,7 @@ class AnnDataBatchReader():
             if len(batch) == 1:
                 d = batch.pop()
             else:
-                d = ad.concat(batch)
+                d = ad.concat(batch, merge='same', uns_merge='same')
             check_dtype(d)
             if self.preload_on_gpu:
                 rsc.get.anndata_to_GPU(d)
@@ -355,7 +355,7 @@ class AnnDataBatchReader():
                     if len(batch) == 1:
                         d = batch.pop()
                     else:
-                        d = ad.concat(batch)
+                        d = ad.concat(batch, merge='same', uns_merge='same')
                     if not self.have_looped_once:
                         anndata.append(sc.AnnData(obs=d.obs, 
                                                 var=d.var,
@@ -382,7 +382,7 @@ class AnnDataBatchReader():
                 if len(batch) == 1:
                     d = batch.pop()
                 else:
-                    d = ad.concat(batch)
+                    d = ad.concat(batch, merge='same', uns_merge='same')
                 if not self.have_looped_once:
                     anndata.append(sc.AnnData(obs=d.obs,
                             var=d.var,
@@ -449,7 +449,7 @@ class AnnDataBatchReader():
                     del(sample_slice)
                     del(sample)
                     # gc()
-                batched_data = ad.concat(batch) 
+                batched_data = ad.concat(batch, merge='same', uns_merge='same') 
                 if cells_filter is not None:
                     batched_data_copy = batched_data[cells_filter].copy()
                 bid += 1
